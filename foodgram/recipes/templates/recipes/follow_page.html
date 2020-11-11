@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Мои подписки {% endblock %}
+{% block css %}<link rel="stylesheet" href="{% static 'pages/myFollow.css' %}">{% endblock %}
+{% block content %}
+{% load user_filters %}
+{% include "nav.html" with my_follow=True %}
+<main class="main container">
+    <div class="main__header">
+        <h1 class="main__title">Мои подписки</h1>
+    </div>
+    <div class="card-list">
+    {% for follow in page %}
+        <div class="card-user" data-author="{{ follow.following.id }}">
+        <div class="card-user__header">
+            <h2 class="card-user__title">{{ follow.following.get_full_name }}</h2>
+        </div>
+        <div class="card-user__body">
+            <ul class="card-user__items">
+            {% for recipe in follow.following.author_recipes.all %}
+                {% if forloop.counter0 < 3 %}
+                <li class="card-user__item">
+                    <div class="recipe">
+                        {% load thumbnail %}
+                        {% thumbnail recipe.image "72x72" crop="center" as im %}
+                        <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}" alt="{{ recipe.title }}" width="{{ im.width }}" height="{{ im.height }}" class="recipe__image"></a>
+                        {% endthumbnail %}
+                        <h3 class="recipe__title">{{ recipe.title }}</h3>
+                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.time }} мин.</p>
+                    </div>
+                </li>
+                {% elif forloop.counter0 == 3 %}
+                <li class="card-user__item">
+                    <a href="{% url 'author_page' recipe.author %}" class="card-user__link link">Еще {{ forloop.revcounter }} рецептов...</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="card-user__footer">
+            {% if follow.following|has_follower:user %}
+                <button class="button button_style_light-blue button_size_auto button_style_blue" name="subscribe">Отписаться</button>
+            {% else %}
+                <button class="button button_style_light-blue button_size_auto" name="subscribe" data-out>Подписаться на автора</button>
+            {% endif %}
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if page.has_other_pages %}
+        {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %}
+</main>
+{% include "recipes_js/my_followJs.html" %}
+{% endblock %}

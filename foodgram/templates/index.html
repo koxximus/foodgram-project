@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if my_favorites %}Избранное{% elif author %}Рецепты {{ author.get_full_name }}{% else %}Рецепты{% endif %}{% endblock %}
+{% block css %}<link rel="stylesheet" href="{% static 'pages/index.css' %}">{% endblock %}
+{% block content %}
+{% load user_filters %}
+{% if my_favorites %}
+    {% include "nav.html" with my_favorites=True %}
+{% else %}
+    {% include "nav.html" with recipes=True %}
+{% endif %}
+<main class="main container">
+        <div class="main__header">
+            <h1 class="main__title">{% if my_favorites %}Избранное{% elif author %}{{ author.get_full_name }}{% else %}Рецепты{% endif %}</h1>
+            {% include "tags.html" %}
+        </div>
+        {% if author and user != author and user.is_authenticated %}
+            <div class="author-subscribe" data-author="{{ author.id }}">
+            <p style="padding: 0 0 2em 0;">
+                {% if author|has_follower:user %}
+                    <button class="button button_style_light-blue button_size_subscribe button_style_blue" name="subscribe">Отписаться от автора</button></p>
+                {% else %}
+                    <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+                {% endif %}
+        {% endif %}
+        </div>
+        <div class="card-list">
+        {% for recipe in page %}
+        <div class="card" data-id="{{ recipe.id }}">
+            {% load thumbnail %}
+            {% thumbnail recipe.image "x240" crop="center" as im %}
+            <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}" alt="{{ recipe.title }}" width="{{ im.width }}" height="{{ im.height }}" class="card__image"></a>
+            {% endthumbnail %}
+            <div class="card__body">
+                <a class="card__title link" href="{% url 'recipe_page' recipe.author.username recipe.id %}" target="_blank">{{ recipe.title }}</a>
+                <ul class="card__items">
+                    {% for tag in recipe.tags.all %}
+                    <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{tag.title}}</span></li>
+                    {% endfor %}
+                </ul>
+                <div class="card__items card__items_column">
+                    <p class="card__text"><span class="icon-time"></span> {{ recipe.time }} мин.</p>
+                    <p class="card__text"><span class="icon-user"></span> <a href="{% url 'author_page' recipe.author.username %}" style="color: black">{{ recipe.author.get_full_name }}</a></p>
+                </div>
+            </div>
+            <div class="card__footer">
+            {% if user.is_authenticated %}
+                {% if recipe|has_customer:user %}
+                    <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
+                {% else %}
+                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                {% endif %}
+                {% if recipe.author != user %}
+                    {% if recipe|has_favor:user %}
+                        <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite icon-favorite_active"></span></button>
+                    {% else %}
+                        <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite icon-favorite"></span></button>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        </div>
+    {% if page.has_other_pages %}
+        {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %}
+</main>
+{% if author %}
+    {% include "recipes_js/author_pageJs.html" %}
+{% elif my_favorites %}
+    {% include "recipes_js/my_favoritesJs.html" %}
+{% else %}
+    {% include "base_js/indexJs.html" %}
+{% endif %}
+{% endblock %}
+
+
+
