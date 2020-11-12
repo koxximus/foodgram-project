@@ -6,7 +6,8 @@ __pycache__/
 # C extensions
 *.so
 .idea
-static/
+foodgram/static/
+foodgram/media
 # Distribution / packaging
 .Python
 build/
