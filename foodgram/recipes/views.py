@@ -1,64 +1,61 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.http import FileResponse
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
-
-from .models import Tag, Recipe, User
 from .forms import RecipeForm
-from .functions import check_ingredients, create_ingredient_amount, pdf_create
-
-
-def page_not_found(request, exception):
-    return render(request, "misc/404.html", {"path": request.path}, status=404)
-
-
-def server_error(request):
-    return render(request, "misc/500.html", status=500)
+from .functions import (
+    check_ingredients,
+    create_ingredient_amount,
+    get_tags_and_recipes_list,
+    pdf_create,
+)
+from .models import Recipe, Tag, User
 
 
 def index(request):
-    tags = request.GET.get("tags", "bld")
-    recipes_list = Recipe.objects.filter(tags__value__in=tags).\
-        order_by("-pub_date")
+    meals, recipes_list = get_tags_and_recipes_list(request)
 
     paginator = Paginator(recipes_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "index.html", {"page": page, "paginator": paginator, "tags": tags})
+    return render(
+        request,
+        "index.html",
+        {"page": page, "paginator": paginator, "tags": meals},
+    )
 
 
 @login_required
 def my_favorites(request, username):
     profile = get_object_or_404(User, username=username)
-    tags = request.GET.get("tags", "bld")
-    if not tags:
-        recipes_list = Recipe.objects.filter(favorites__follower=profile).\
-            order_by("-pub_date")
-    else:
-        recipes_list = Recipe.objects.filter(favorites__follower=profile).\
-            filter(tags__value__in=tags).\
-            order_by("-pub_date")
+    meals, recipes_list = get_tags_and_recipes_list(request)
+    recipes_list = recipes_list.filter(favorites__follower=profile)
 
     paginator = Paginator(recipes_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "index.html", {"page": page, "paginator": paginator, "tags": tags, "my_favorites": True})
+    return render(
+        request,
+        "index.html",
+        {
+            "page": page,
+            "paginator": paginator,
+            "tags": meals,
+            "my_favorites": True,
+        },
+    )
 
 
 @login_required
 def new_recipe(request):
-    if request.method == "POST":
-        form = RecipeForm(request.POST, request.FILES)
+    form = RecipeForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
         ingredients = check_ingredients(request)
-
-        if not form.is_valid():
-            return render(request, "recipes/recipe.html", {"form": form})
         if not ingredients:
             form.add_error(None, "Это поле пустое или заполненно неправильно.")
             return render(request, "recipes/recipe.html", {"form": form})
-
         recipe = form.save(commit=False)
         recipe.author = request.user
         recipe.save()
@@ -66,41 +63,44 @@ def new_recipe(request):
 
         create_ingredient_amount(ingredients, recipe)
 
-        return redirect('index')
-
-    form = RecipeForm()
+        return redirect("index")
     return render(request, "recipes/recipe.html", {"form": form})
 
 
 @login_required
 def recipe_edit(request, username, recipe_id):
-    author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(Recipe, id=recipe_id, author=author)
+    recipe = get_object_or_404(Recipe, id=recipe_id, author__username=username)
 
     if recipe.author != request.user:
         return redirect("recipe_page", recipe_id=recipe_id)
 
-    if request.method == "POST":
-        form = RecipeForm(request.POST, request.FILES, instance=recipe)
-
-        if not form.is_valid():
-            return render(request, "recipes/recipe.html", {"form": form})
+    form = RecipeForm(
+        request.POST or None, request.FILES or None, instance=recipe
+    )
+    if form.is_valid():
+        ingredients = check_ingredients(request)
+        if not ingredients:
+            form.add_error(None, "Это поле пустое или заполненно неправильно.")
+            return render(
+                request,
+                "recipes/recipe.html",
+                {"form": form, "recipe": recipe},
+            )
 
         form.save()
 
-        recipe.ingredient_amount.filter(recipe=recipe).delete()
-        create_ingredientamount(request, recipe)
+        recipe.ingredient_amounts.filter(recipe=recipe).delete()
+        create_ingredient_amount(ingredients, recipe)
 
-        return redirect("recipe_page", username=author.username, recipe_id=recipe_id)
-
-    form = RecipeForm(instance=recipe)
-    return render(request, "recipes/recipe.html", {"form": form, "recipe": recipe})
+        return redirect("recipe_page", username=username, recipe_id=recipe_id)
+    return render(
+        request, "recipes/recipe.html", {"form": form, "recipe": recipe}
+    )
 
 
 @login_required
 def recipe_del(request, username, recipe_id):
-    author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(Recipe, id=recipe_id, author=author)
+    recipe = get_object_or_404(Recipe, id=recipe_id, author__username=username)
 
     if recipe.author != request.user:
         return redirect("recipe_page", recipe_id=recipe_id)
@@ -116,16 +116,22 @@ def recipe_page(request, username, recipe_id):
 
 def author_page(request, username):
     author = get_object_or_404(User, username=username)
-    tags = request.GET.get("tags")
-    if not tags:
-        recipes_list = author.author_recipes.all().order_by("-pub_date")
-    else:
-        recipes_list = author.author_recipes.filter(tags__value__contains=tags).order_by("-pub_date")
+    meals, recipes_list = get_tags_and_recipes_list(request)
+    recipes_list = recipes_list.filter(author=author)
 
     paginator = Paginator(recipes_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "index.html", {"page": page, "paginator": paginator, "tags": tags, "author": author})
+    return render(
+        request,
+        "index.html",
+        {
+            "page": page,
+            "paginator": paginator,
+            "tags": meals,
+            "author": author,
+        },
+    )
 
 
 @login_required
@@ -135,12 +141,20 @@ def follow_page(request, username):
     if not profile == request.user:
         return redirect("my_follow", request.user.username)
 
-    follow_list = profile.follower.all().order_by("-following__author_recipes__pub_date")
+    follow_list = (
+        profile.follower.select_related("following")
+        .all()
+        .order_by("-following__recipes__pub_date")
+    )
 
     paginator = Paginator(follow_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "recipes/follow_page.html", {"page": page, "paginator": paginator})
+    return render(
+        request,
+        "recipes/follow_page.html",
+        {"page": page, "paginator": paginator},
+    )
 
 
 @login_required
@@ -156,10 +170,12 @@ def shoplist(request, username):
 
 @login_required
 def download_shoplist(request, username):
-    recipes = Recipe.objects.filter(purchases__customer=request.user).\
-        values("ingredients__title", "ingredients__dimension").\
-        annotate(amount=Sum("ingredient_amount__amount")).\
-        order_by("ingredients__title")
-
+    recipes = (
+        Recipe.objects.prefetch_related("ingredients", "ingredient_amounts")
+        .filter(purchases__customer=request.user)
+        .values("ingredients__title", "ingredients__dimension")
+        .annotate(amount=Sum("ingredient_amounts__amount"))
+        .order_by("ingredients__title")
+    )
     buffer = pdf_create(recipes)
-    return FileResponse(buffer, as_attachment=True, filename='shoplist.pdf')
+    return FileResponse(buffer, as_attachment=True, filename="shoplist.pdf")

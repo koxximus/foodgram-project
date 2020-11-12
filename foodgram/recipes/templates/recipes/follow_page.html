@@ -4,7 +4,7 @@
 {% block css %}<link rel="stylesheet" href="{% static 'pages/myFollow.css' %}">{% endblock %}
 {% block content %}
 {% load user_filters %}
-{% include "nav.html" with my_follow=True %}
+{% include "includes/nav.html" with my_follow=True %}
 <main class="main container">
     <div class="main__header">
         <h1 class="main__title">Мои подписки</h1>
@@ -17,7 +17,7 @@
         </div>
         <div class="card-user__body">
             <ul class="card-user__items">
-            {% for recipe in follow.following.author_recipes.all %}
+            {% for recipe in follow.following.recipes.all %}
                 {% if forloop.counter0 < 3 %}
                 <li class="card-user__item">
                     <div class="recipe">
@@ -48,7 +48,7 @@
         {% endfor %}
     </div>
     {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator%}
+        {% include "includes/paginator.html" with items=page paginator=paginator%}
     {% endif %}
 </main>
 {% include "recipes_js/my_followJs.html" %}

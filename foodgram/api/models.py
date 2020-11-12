@@ -1,26 +1,37 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from rest_framework.exceptions import ValidationError
 
 from recipes.models import Recipe
-
 
 User = get_user_model()
 
 
 class Favorite(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorites")
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="favorites")
+    follower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="favorites"
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name="favorites"
+    )
 
     class Meta:
-        unique_together = ["follower", "recipe"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "recipe"], name="unique_favorites"
+            )
+        ]
         verbose_name = "Избранное"
         verbose_name_plural = "Избранное"
 
 
 class Follow(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="follower")
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
+    follower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="follower"
+    )
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="author"
+    )
 
     class Meta:
         unique_together = ["follower", "following"]
@@ -33,8 +44,12 @@ class Follow(models.Model):
 
 
 class Purchase(models.Model):
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="purchases")
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="purchases")
+    customer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="purchases"
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name="purchases"
+    )
 
     class Meta:
         unique_together = ["customer", "recipe"]

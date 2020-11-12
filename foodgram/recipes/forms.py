@@ -10,8 +10,10 @@ class MyClearableFileInput(ClearableFileInput):
 
 
 class RecipeForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=True,
-                                          widget=forms.CheckboxSelectMultiple)
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=True, widget=forms.CheckboxSelectMultiple
+    )
 
     class Meta:
         model = Recipe
@@ -25,5 +27,5 @@ class RecipeForm(forms.ModelForm):
             "title": "Название рецепта",
             "time": "Время приготовления",
             "description": "Описание",
-            "image": "Загрузить фото"
+            "image": "Загрузить фото",
         }

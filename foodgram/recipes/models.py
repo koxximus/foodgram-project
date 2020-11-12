@@ -1,6 +1,5 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-
+from django.db import models
 
 User = get_user_model()
 
@@ -32,11 +31,15 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_recipes")
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="recipes"
+    )
     title = models.CharField("названием", max_length=200, unique=True)
     image = models.ImageField(upload_to="recipes/")
     description = models.TextField(null=False, blank=False)
-    ingredients = models.ManyToManyField(Ingredient, related_name="recipes", through="IngredientAmount")
+    ingredients = models.ManyToManyField(
+        Ingredient, related_name="recipes", through="IngredientAmount"
+    )
     tags = models.ManyToManyField(Tag, related_name="recipes")
     time = models.PositiveSmallIntegerField()
     pub_date = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -50,8 +53,12 @@ class Recipe(models.Model):
 
 
 class IngredientAmount(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="ingredient_amount")
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ingredient_amount")
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, related_name="ingredient_amounts"
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name="ingredient_amounts"
+    )
     amount = models.IntegerField()
 
     class Meta:
@@ -59,4 +66,4 @@ class IngredientAmount(models.Model):
         verbose_name_plural = "Состав"
 
     def __str__(self):
-        return f'{self.ingredient.title}({self.ingredient.dimension}) - {self.amount} '
+        return f"{self.ingredient.title}({self.ingredient.dimension}) - {self.amount}"

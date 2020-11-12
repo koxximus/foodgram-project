@@ -5,9 +5,9 @@
 {% block content %}
 {% load user_filters %}
 {% if recipe %}
-    {% include "nav.html" %}
+    {% include "includes/nav.html" %}
 {% else %}
-    {% include "nav.html" with creation=True %}
+    {% include "includes/nav.html" with creation=True %}
 {% endif %}
 
 <main class="main container">
@@ -52,7 +52,7 @@
                     </div>
                     <div class="form__field-group-ingredientes-container">
                     {% if recipe %}
-                        {% for ing_amount in recipe.ingredient_amount.all %}
+                        {% for ing_amount in recipe.ingredient_amounts.all %}
                         <div id="ing_{{ ing_amount.ingredient.id }}" class="form__field-item-ingredient">
                         <span> {{ ing_amount.ingredient.title }} {{ ing_amount.amount }} {{ ing_amount.ingredient.dimension }}</span> <span class="form__field-item-delete"></span>
                              <input id="nameIngredient_{{ ing_amount.ingredient.id }}" name="nameIngredient_{{ ing_amount.ingredient.id }}" type="hidden" value="{{ ing_amount.ingredient.title }}">

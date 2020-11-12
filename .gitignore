@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 .idea
+.static
 # Distribution / packaging
 .Python
 build/
@@ -60,7 +61,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
+pyproject.toml
 # Flask stuff:
 instance/
 .webassets-cache

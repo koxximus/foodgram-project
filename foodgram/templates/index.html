@@ -5,14 +5,14 @@
 {% block content %}
 {% load user_filters %}
 {% if my_favorites %}
-    {% include "nav.html" with my_favorites=True %}
+    {% include "includes/nav.html" with my_favorites=True %}
 {% else %}
-    {% include "nav.html" with recipes=True %}
+    {% include "includes/nav.html" with recipes=True %}
 {% endif %}
 <main class="main container">
         <div class="main__header">
             <h1 class="main__title">{% if my_favorites %}Избранное{% elif author %}{{ author.get_full_name }}{% else %}Рецепты{% endif %}</h1>
-            {% include "tags.html" %}
+                {% include "includes/tags.html" %}
         </div>
         {% if author and user != author and user.is_authenticated %}
             <div class="author-subscribe" data-author="{{ author.id }}">
@@ -64,7 +64,7 @@
 
         </div>
     {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator%}
+        {% include "includes/paginator.html" with items=page paginator=paginator%}
     {% endif %}
 </main>
 {% if author %}

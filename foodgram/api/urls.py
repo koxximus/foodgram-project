@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from . import views
@@ -10,6 +10,6 @@ router.register("purchases", views.PurchaceViewSet, basename="purchases")
 
 
 urlpatterns = [
-    path("ingredients/", views.ListIng.as_view(), name="get_ingredients"),
-    path("", include(router.urls)),
+    path("v1/ingredients/", views.ListIng.as_view(), name="get_ingredients"),
+    path("v1/", include(router.urls)),
 ]
