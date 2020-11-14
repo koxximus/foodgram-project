@@ -54,7 +54,7 @@ def pdf_create(ingredients):
 
     # faceName - view a010013l.AFM file as a plain text and look at
     # row beginning with 'FontName' word (it's usually the fourth row).
-    # The word after 'FontName' is the faceName ('URWGothicL-Book' in this case).
+    # The word after 'FontName' is the faceName ('URWGothicL-Book').
     faceName = "URWGothicL-Book"
 
     # Define new Type 1 font
