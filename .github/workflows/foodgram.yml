@@ -26,9 +26,6 @@ jobs:
     - name: Lint with flake8
       run: flake8 --ignore=F401,E501 --exclude=static,migrations ..
 
-    - name: Test with pytest
-      run: pytest
-
   push_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
@@ -74,7 +71,7 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env_sec
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env_sec
             echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env_sec
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> env_sec
+            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env_sec
             sudo docker-compose pull
             sudo docker-compose down
             sudo docker-compose up -d --no-build --force-recreate
