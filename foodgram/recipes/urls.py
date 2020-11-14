@@ -8,7 +8,9 @@ urlpatterns = [
     path("<str:username>/", views.author_page, name="author_page"),
     path("<str:username>/follow/", views.follow_page, name="my_follow"),
     path(
-        "<str:username>/<int:recipe_id>", views.recipe_page, name="recipe_page"
+        "<str:username>/<int:recipe_id>/",
+        views.recipe_page,
+        name="recipe_page",
     ),
     path(
         "<str:username>/<int:recipe_id>/edit/",

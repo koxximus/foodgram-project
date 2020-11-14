@@ -4,9 +4,11 @@ django-filter==2.4.0
 djangorestframework==3.12.1
 Markdown==3.3.3
 Pillow==8.0.1
-psycopg2-binary==2.8.5
 py-postgresql==1.2.2
 pytz==2020.1
 reportlab==3.5.55
 sorl-thumbnail==12.6.3
 sqlparse==0.4.1
+gunicorn==20.0.4
+python-dotenv
+psycopg2-binary==2.8.5

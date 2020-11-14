@@ -1,0 +1,5 @@
+# These files will not be copied to the Docker app container
+.env
+foodgram/media/
+foodgram/static/
+venv/

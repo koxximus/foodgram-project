@@ -1,0 +1,34 @@
+version: "3.8"
+
+volumes:
+  postgres_data:
+  static_volume:
+
+services:
+  db:
+    image: postgres:12.4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env_sec
+  web:
+    image: koxximus/foodgram:v1.0
+    build: .
+    restart: always
+    expose:
+    - 8000
+    volumes:
+    - static_volume:/app/vol/web/
+    depends_on:
+      - db
+    env_file:
+      - .env_sec
+
+  nginx:
+    build: ./nginx
+    volumes:
+    - static_volume:/vol/static/
+    ports:
+    - 80:80
+    depends_on:
+      - web

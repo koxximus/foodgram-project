@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "w^d1adenas42+_+5e*-&7qn#wmc#tut$!(zp!u5qzefj%@tah!"
+SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS")
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(","))
 
 
 # Application definition
@@ -84,13 +89,13 @@ WSGI_APPLICATION = "foodgram.wsgi.application"
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "foodgram",
-        "USER": "koxximus",
-        "PASSWORD": "koxx66613",
-        "HOST": "127.0.0.1",
-        "PORT": "5433",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -131,11 +136,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = "/static/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "vol/web/static")
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/static/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "vol/web/media")
 
 LOGIN_URL = "/auth/login/"
 

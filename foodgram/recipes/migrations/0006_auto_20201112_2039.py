@@ -6,12 +6,19 @@ import json
 
 def code(apps, schema_editor):
     Ingredient = apps.get_model("recipes", "Ingredient")
+    Tag = apps.get_model("recipes", "Tag")
+
+    Tag.objects.create(title="Завтрак", color="green", value="b")
+    Tag.objects.create(title="Обед", color="orange", value="l")
+    Tag.objects.create(title="Ужин", color="purple", value="d")
+
     ingredients = []
     with open("ingredients.json", "r", encoding="utf-8", newline='') as jf:
         data = json.load(jf)
         for row in data:
             ingredients.append(Ingredient(title=row["title"], dimension=row["dimension"]))
     Ingredient.objects.bulk_create(ingredients)
+    Tag
 
 
 def reverse_code(apps, schema_editor):
