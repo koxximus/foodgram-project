@@ -1,4 +1,4 @@
-![yamdb_final](https://github.com/koxximus/yamdb_final/workflows/Foodgram/badge.svg)
+![yamdb_final](https://github.com/koxximus/foodgram-project/workflows/Foodgram/badge.svg)
 # Foodgram 
 # Working sample you can find 84.201.151.214
 
