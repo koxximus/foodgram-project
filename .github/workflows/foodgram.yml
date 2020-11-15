@@ -72,7 +72,7 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env_sec
             echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env_sec
             sudo docker-compose pull
-            sudo docker-compose down
+            sudo docker stop $(sudo docker ps -a -q)
             sudo docker-compose up -d --no-build --force-recreate
 
   send_message:

@@ -8,8 +8,8 @@ def code(apps, schema_editor):
     Ingredient = apps.get_model("recipes", "Ingredient")
     Tag = apps.get_model("recipes", "Tag")
 
-    Tag.objects.create(title="Завтрак", color="green", value="b")
-    Tag.objects.create(title="Обед", color="orange", value="l")
+    Tag.objects.create(title="Завтрак", color="orange", value="b")
+    Tag.objects.create(title="Обед", color="green", value="l")
     Tag.objects.create(title="Ужин", color="purple", value="d")
 
     ingredients = []
