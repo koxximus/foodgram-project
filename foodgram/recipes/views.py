@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
-from django.http import FileResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import RecipeForm
@@ -177,5 +177,13 @@ def download_shoplist(request, username):
         .annotate(amount=Sum("ingredient_amounts__amount"))
         .order_by("ingredients__title")
     )
-    buffer = pdf_create(recipes)
-    return FileResponse(buffer, as_attachment=True, filename="shoplist.pdf")
+
+    ingredient_txt = [
+        (f"\u2022 {item['ingredients__title'].capitalize()} "
+         f"({item['ingredients__dimension']}) \u2014 {item['amount']} \n")
+        for item in recipes
+    ]
+    filename = 'ingredients.txt'
+    response = HttpResponse(ingredient_txt, content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    return response

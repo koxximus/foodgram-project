@@ -1,4 +1,7 @@
-# Foodgram
+![yamdb_final](https://github.com/koxximus/yamdb_final/workflows/Foodgram/badge.svg)
+# Foodgram 
+# Working sample you can find 84.201.151.214
+
 
 This project allows you to publish various recipes. Users can follow authors and add their recipes to favorite or shoping list.
 
@@ -10,53 +13,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 You need to install Docker.
 
-for Ubuntu:
-1. Uninstall old versions
-
-```
-$ sudo apt-get remove docker docker-engine docker.io containerd runc
-```
-2. Set up the repository
-
-```
-$ sudo apt-get update
-
-$ sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-```
-3. Add Docker’s official GPG key
-
-```
-$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-```
-4. Set up the stable repository
-
-```
-$ sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-```
-5. Install Docker Engine:
-
-```
-$ sudo apt-get update
-$ sudo apt-get install docker-ce docker-ce-cli containerd.io
-```
-[For other OS](https://docs.docker.com/engine/install/)
+[install docker](https://docs.docker.com/engine/install/)
 
 Install Docker Compose
-For Ubuntu:
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
-sudo chmod +x /usr/local/bin/docker-compose
-```
-[For other OS](https://docs.docker.com/compose/install/)
+[intall docker-compose](https://docs.docker.com/compose/install/)
 
 ### Installing
 
@@ -71,7 +32,7 @@ DB_HOST=db
 DB_PORT=5432 
 ```
 
-Build images with Docker
+Build images with Docker-compose
 
 ```
 $ sudo docker-compose create
@@ -82,7 +43,7 @@ $ sudo docker-compose create
 Run services
 
 ```
-$ sudo docker-compose start
+$ sudo docker-compose up -d
 
 ```
 
@@ -90,12 +51,6 @@ Connect to web service with CONTAINER_ID
 
 ```
 $ sudo docker exec -it CONTAINER_ID bash
-
-```
-Make migrations
-
-```
-root@CONTAINER_ID:/code# python manage.py migrate
 
 ```
 

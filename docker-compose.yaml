@@ -12,7 +12,7 @@ services:
     env_file:
       - .env_sec
   web:
-    image: koxximus/foodgram:v1.7
+    image: koxximus/foodgram:v1.9
     restart: always
     expose:
     - 8000
